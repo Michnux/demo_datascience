@@ -1,0 +1,10 @@
+Dockerfile
+
+
+*.mp4
+models*
+vids*
+wandb*
+test*
+yolov5*
+*__pycache__*
