@@ -27,8 +27,8 @@ RUN pip3 install alteia
 COPY YOLO/yolov5/requirements.txt /home/requirements.txt
 RUN pip3 install -r /home/requirements.txt
 
-#COPY script_dir /home/script_dir/
-#COPY python /home/python/
+COPY YOLO /home/YOLO/
 
-CMD ["sleep", "1d"]
-#CMD ["python3", "/home/script_dir/main.py"]
+WORKDIR /home/YOLO/
+#CMD ["sleep", "1d"]
+CMD ["python3", "main.py"]

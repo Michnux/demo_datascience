@@ -4,6 +4,7 @@
 *.pt
 *.yaml
 
+*project/
 *dataset/
 *annotations/
 *labels/

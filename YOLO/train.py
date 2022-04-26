@@ -1,8 +1,12 @@
 import os
+import subprocess
 import yaml
 import json
+from pathlib import Path
+import shutil
 import alteia
 from AlteiaTransactions.ImportDataset import import_dataset
+from AlteiaTransactions.ExportWeights import export_weights
 
 
 
@@ -10,59 +14,68 @@ import sys
 sys.path.insert(1, './yolov5/')
 
 
-def create_dataset(project_id, mission_id, classes, destination_folder):
+def create_dataset(project_id, mission_id, WORKING_DIR):
 
+	classes = import_dataset(project_id, mission_id, 'yolo_training', WORKING_DIR / 'dataset')
 
-	import_dataset(project_id, mission_id, 'yolo_training', destination_folder)
-
+	print('classes of dataset')
+	print(classes)
 
 
 	#generate yaml
-	yamld = {	'train': destination_folder+'images/',
-				'val': destination_folder+'images/',
+	yamld = {	
+				'path' : str(WORKING_DIR / 'dataset'),
+				'train': 'images',
+				'val': 'images',
 				#number of classes
 				'nc': len(classes),
 				#class names
-				'names': json.dumps(classes)[1:-1]
+				'names': classes
 			}
 
 	#dump yaml
-	file_name = destination_folder+'ds.yaml'
+	file_name = WORKING_DIR /'dataset/ds.yaml'
 
 	with open(file_name, 'w') as file:
-		yaml.dump(yamld, file)
+		yaml.dump(yamld, file, default_flow_style=None)
 
 
-	return destination_folder, file_name
+
+
+
+def train(project_id, mission_id, epochs, image_size, WORKING_DIR):
+
+	create_dataset(project_id, mission_id, WORKING_DIR)
+
+	dataset_path = WORKING_DIR / 'dataset' / 'ds.yaml'
+	project_path = WORKING_DIR / 'project'
+	weights_path = WORKING_DIR / 'input_yv5.pt'
+
+	cmd = "python3 ./yolov5/train.py --img "+str(image_size)+\
+									" --batch 2 --epochs "+str(epochs)+\
+									" --data "+str(dataset_path)+\
+									" --weights "+str(weights_path)+\
+									" --project "+str(project_path)+\
+									" --name current --exist-ok"  # --nosave True"
+	subprocess.run(cmd, shell=True)
+
+	# rename and copy model file to cur directory
+	shutil.copyfile(project_path/'current/weights/last.pt', WORKING_DIR/'yv5.pt')
+
+	export_weights(project_id, WORKING_DIR/'yv5.pt')
+
+
 
 
 
 
 if __name__ == "__main__":
 
-
-
-	#get current folder
-	pwd = os.getcwd()
-	spl = pwd.split('\\')
-	pwd=''
-	for s in spl:
-		pwd+=s+'/'
-
-
 	sdk = alteia.SDK(config_path='./config-connections.json')
 	project = sdk.projects.search(filter={'name': {'$eq': 'Demo_datascience'}})[0]
 	mission = sdk.missions.search(filter={'project': {'$eq': project.id}})[0]
-
-	destination_folder = pwd+'dataset/'
-
-	classes = ["person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "couch", "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse", "remote", "keyboard", "cell phone", "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors", "teddy bear", "hair drier", "toothbrush"]
 	
-	ds_dir, ds_file = create_dataset(project.id, mission.id, classes, destination_folder)
+	epochs = 10
+	WORKING_DIR = Path('./').resolve()
 
-	os.system('python3 ./yolov5/train.py --img 640 --batch 16 --epochs 500 --data '+ds_file+' --weights yolov5s.pt --name current --exist-ok')
-
-
-	# rename and copy model file to model directory
-	# copyfile('./runs/train/current/weights/last.pt', ds_dir+'yv5.pt')
-	# copyfile(ds_dir+'yv5.pt', PATH_TO_VIDS+'models/yv5.pt')
+	train(project.id, mission.id, epochs, WORKING_DIR)

@@ -3,7 +3,7 @@ import os
 import string
 import pandas as pd
 import json
-
+from pathlib import Path
 
 
 
@@ -35,12 +35,11 @@ def export_annotations(project_id, mission_id, annotations_format, annotations_d
 	#put yolo annotations in a pandas df
 	if annotations_format=='yolo':
 
-		an_files=os.listdir(annotations_dir+'labels/')
+		an_files=os.listdir(annotations_dir/'labels/')
 		df_annotations = pd.DataFrame()
 
 		for f in an_files:
-			print(f)
-			df = pd.read_csv(annotations_dir+'labels/'+f, sep=' ', names=['class', 'x', 'y', 'width', 'height', 'score'], header=None, index_col=False)
+			df = pd.read_csv(annotations_dir/'labels'/f, sep=' ', names=['class', 'x', 'y', 'width', 'height', 'score'], header=None, index_col=False)
 			df['image_name']=f[:-4]
 			df_annotations = pd.concat([df_annotations, df])
 
@@ -54,10 +53,10 @@ def export_annotations(project_id, mission_id, annotations_format, annotations_d
 
 		# df_annotations['class_name']=df_annotations['class'].map(lambda x: str(x)) #fixme
 
-		print(df_annotations.to_string())
+		# print(df_annotations.to_string())
 
 		#put classes_names in exp/classes.json in a pandas dataframe (index = clss)
-		with open(annotations_dir+'classes.json', 'r') as class_file:
+		with open(annotations_dir/'classes.json', 'r') as class_file:
 			class_names = json.load(class_file)
 			df_classes = pd.DataFrame()
 			df_classes['class_name'] = class_names
@@ -92,19 +91,12 @@ def export_annotations(project_id, mission_id, annotations_format, annotations_d
 if __name__ == "__main__":
 
 
-	#get current folder
-	pwd = os.getcwd()
-	spl = pwd.split('\\')
-	pwd=''
-	for s in spl:
-		pwd+=s+'/'
-
-
-
 	sdk = alteia.SDK(config_path='./config-connections.json')
 	project = sdk.projects.search(filter={'name': {'$eq': 'Demo_datascience'}})[0]
 	mission = sdk.missions.search(filter={'project': {'$eq': project.id}})[0]
 
-	annotations_dir = pwd+'../dataset/exp3/'
+
+	WORKING_DIR = Path('./').resolve()
+	annotations_dir = WORKING_DIR / 'dataset/exp/'
 
 	export_annotations(project.id, mission.id, 'yolo', annotations_dir)

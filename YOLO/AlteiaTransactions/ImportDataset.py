@@ -2,18 +2,18 @@ import alteia
 import os
 import string
 import pandas as pd
-
+from pathlib import Path
 
 
 
 ds_formats = ['SuperAnnotate', 'yolo_inference', 'yolo_training']
 
 
-def import_dataset(project_id, mission_id, ds_format, destination_folder):
+def import_dataset(project_id, mission_id, ds_format, destination_dir):
 
 	#create destination dir if doesn't exist
-	if not os.path.isdir(destination_folder):
-		os.mkdir(destination_folder)
+	if not os.path.isdir(destination_dir):
+		os.mkdir(destination_dir)
 
 	#open Alteia sdk
 	sdk = alteia.SDK(config_path='./config-connections.json')
@@ -38,12 +38,12 @@ def import_dataset(project_id, mission_id, ds_format, destination_folder):
 		images_sa = []
 
 	#create dir: dataset/images
-	if not os.path.isdir(destination_folder+'images/'):
-		os.mkdir(destination_folder+'images/')
+	if not os.path.isdir(destination_dir/'images/'):
+		os.mkdir(destination_dir/'images/')
 
 	for d in images_datasets:
 		try:
-			path = sdk.datasets.download_image_as_jpeg(d.id, target_path=destination_folder+'images/')
+			path = sdk.datasets.download_image_as_jpeg(d.id, target_path=destination_dir/'images/')
 		except FileExistsError as e:
 			path = e.args[0][16:]
 		
@@ -51,7 +51,7 @@ def import_dataset(project_id, mission_id, ds_format, destination_folder):
 		if ds_format=='SuperAnnotate': #generate thumbnail in images folder
 			try:
 				thumb_name = "thmb_"+path.split('/')[-1]
-				thumb_path = sdk.datasets.download_preview(d.id, target_path=destination_folder+'images/thumb/', target_name=thumb_name)
+				thumb_path = sdk.datasets.download_preview(d.id, target_path=destination_dir/'images/thumb/', target_name=thumb_name)
 			except FileExistsError as e:
 				thumb_path = e.args[0][16:]
 
@@ -68,7 +68,7 @@ def import_dataset(project_id, mission_id, ds_format, destination_folder):
 		json_string = json_string.replace('/', '\\\\')
 		json_string = json_string.replace('\'True\'', 'true')
 
-		text_file = open(destination_folder+'images/images.sa', "w")
+		text_file = open(destination_dir/'images/images.sa', "w")
 		text_file.write(json_string)
 		text_file.close()
 
@@ -97,7 +97,7 @@ def import_dataset(project_id, mission_id, ds_format, destination_folder):
 									})])
 
 		df_classes = pd.DataFrame()
-		df_classes['class_name'] = df_annotations['class_name'].drop_duplicates()
+		df_classes['class_name'] = df_annotations['class_name'].drop_duplicates() #sort in alphabetical order?
 		df_classes['class']=range(df_classes.shape[0])
 
 		#df_annotations < - - df_images
@@ -112,34 +112,33 @@ def import_dataset(project_id, mission_id, ds_format, destination_folder):
 		df_annotations['height']= (-df_annotations['y1']+df_annotations['y2'])/df_annotations['size_y']
 
 
-		print(destination_folder+'annotations/')
-		#create yolo annotations foleder and files
-		if not os.path.isdir(destination_folder+'annotations/'):
-			print('creating folder')
-			os.mkdir(destination_folder+'annotations/')
+		#create yolo annotations dir and files
+		if not os.path.isdir(destination_dir/'labels'):
+			os.mkdir(destination_dir/'labels')
 
 		for im in df_images['image_name'].tolist():
 			dfo = df_annotations[df_annotations['image_name']==im]
-			dfo[['class', 'x_center', 'y_center', 'width', 'height']].to_csv(destination_folder+'annotations/'+im+'.txt', sep=' ', index=False, header=False)#remove header & index
+			dfo = dfo.drop_duplicates()
+			dfo[['class', 'x_center', 'y_center', 'width', 'height']].to_csv(destination_dir/'labels'/(im+'.txt'), sep=' ', index=False, header=False)#remove header & index
+
+
+		#return the classes taken from in the annotations form the alteia pf
+		return df_classes['class_name'].tolist()
+
+	#return None
+
+
 
 
 
 if __name__ == "__main__":
 
 
-	#get current folder
-	pwd = os.getcwd()
-	spl = pwd.split('\\')
-	pwd=''
-	for s in spl:
-		pwd+=s+'/'
-
-
-
 	sdk = alteia.SDK(config_path='./config-connections.json')
 	project = sdk.projects.search(filter={'name': {'$eq': 'Demo_datascience'}})[0]
 	mission = sdk.missions.search(filter={'project': {'$eq': project.id}})[0]
 
-	destination_folder = pwd+'dataset/'
+	WORKING_DIR = Path('./').resolve()
+	dataset_dir = WORKING_DIR / 'dataset'
 
-	import_dataset(project.id, mission.id, 'yolo_training', destination_folder)
+	import_dataset(project.id, '624c11fd95060600073dedfb', 'yolo_training', dataset_dir)
