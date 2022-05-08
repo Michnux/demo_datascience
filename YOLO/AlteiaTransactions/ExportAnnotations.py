@@ -4,6 +4,7 @@ import string
 import pandas as pd
 import json
 from pathlib import Path
+from matplotlib import cm
 
 
 
@@ -32,14 +33,17 @@ def export_annotations(project_id, mission_id, annotations_format, annotations_d
 
 	df_images=df_images.drop_duplicates() #it is assumed there is no duplicates
 
+	print(df_images.to_string())
+
 	#put yolo annotations in a pandas df
 	if annotations_format=='yolo':
 
 		an_files=os.listdir(annotations_dir/'labels/')
-		df_annotations = pd.DataFrame()
+		df_annotations = pd.DataFrame(columns = ['class', 'x', 'y', 'width', 'height', 'score', 'image_name'])
 
 		for f in an_files:
-			df = pd.read_csv(annotations_dir/'labels'/f, sep=' ', names=['class', 'x', 'y', 'width', 'height', 'score'], header=None, index_col=False)
+			# df = pd.read_csv(annotations_dir/'labels'/f, sep=' ', names=['class', 'x', 'y', 'width', 'height', 'score'], header=None, index_col=False)
+			df = pd.read_csv(annotations_dir/'labels'/f, sep=' ', names=['class', 'x', 'y', 'width', 'height'], header=None, index_col=False)
 			df['image_name']=f[:-4]
 			df_annotations = pd.concat([df_annotations, df])
 
@@ -64,6 +68,10 @@ def export_annotations(project_id, mission_id, annotations_format, annotations_d
 		df_annotations = df_annotations.join(df_classes, on='class')
 
 
+	print(df_annotations.to_string())
+
+	cmap_boxes = cm.get_cmap("Set1") # colour map
+
 	#create alteia annotations
 	for _, r in df_annotations.iterrows():
 
@@ -71,6 +79,10 @@ def export_annotations(project_id, mission_id, annotations_format, annotations_d
 		x2 = r['x2']
 		y1 = r['y1']
 		y2 = r['y2']
+
+		rgba = cmap_boxes(int(r['class']%9))
+		rgb = [int(rgba[0]*255), int(rgba[1]*255), int(rgba[2]*255)]
+
 
 		sdk.annotations.create(
 			project=project_id,
@@ -81,9 +93,10 @@ def export_annotations(project_id, mission_id, annotations_format, annotations_d
 			name=r['class_name'],
 			type='image',
 			target=r['image_id'],
-			stroke_width=0,
+			stroke=rgb,
+			stroke_width=2,
 			stroke_opacity=0.8,
-			fill=[0,0,150],
+			fill=rgb,
 			fill_opacity=0.8
 			)
 
