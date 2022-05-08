@@ -18,7 +18,7 @@ if len(analytic)>0:
 
 
 sdk.analytics.create(name="alteiademo/run_yolov5",
-	version="1.0.0",
+	version="2.0.0",
 	display_name="run_yolov5",
 	description="Runs yolov5 (object detection) on a survey",
 	docker_image="registry-1.docker.io/michaeldelagarde/yv5:latest",
@@ -30,7 +30,7 @@ sdk.analytics.create(name="alteiademo/run_yolov5",
 			"display_name": "weights",
 			"description": ".pt weights file",
 			"scheme": {
-				"type": "string", "pattern": "^[0-9a-f]{24}$"
+				# "type": "string", "pattern": "^[0-9]{1,24}$"
 			},
 			"source": {
 				"service": "data-manager",
@@ -54,7 +54,7 @@ sdk.analytics.create(name="alteiademo/run_yolov5",
 
 
 sdk.analytics.create(name="alteiademo/train_yolov5",
-	version="1.0.0",
+	version="2.0.0",
 	display_name="train_yolov5",
 	description="Runs yolov5 (object detection) on a survey",
 	docker_image="registry-1.docker.io/michaeldelagarde/yv5:latest",
@@ -66,7 +66,7 @@ sdk.analytics.create(name="alteiademo/train_yolov5",
 			"display_name": "weights",
 			"description": ".pt weights file to be used as initial model for training (Default: yolov5s.pt)",
 			"scheme": {
-				"type": "string", "pattern": "^[0-9a-f]{24}$"
+				# "type": "string", "pattern": "^[0-9]{1,24}$"
 			},
 			"source": {
 				"service": "data-manager",
@@ -89,17 +89,17 @@ sdk.analytics.create(name="alteiademo/train_yolov5",
 		"required": True,
 		"scheme": {
 			"type": "string",
-			"pattern": "^[0-9]{24}$"
+			"pattern": "^[0-9]{1,24}$"
 		}
 	 },
 	{
 		"name": "image_size",
-		"display_name": "Number of epochs",
+		"display_name": "Image Size",
 		"description": " COCO trains at native resolution of --img 640, though due to the high amount of small objects in the dataset it can benefit from training at higher resolutions such as --img 1280. If there are many small objects then custom datasets will benefit from training at native or higher resolution. Best inference results are obtained at the same --img as the training was run at, i.e. if you train at --img 1280 you should also test and detect at --img 1280",
 		"required": False,
 		"scheme": {
 			"type": "string",
-			"pattern": "^[0-9]{24}$"
+			"pattern": "^[0-9]{1,24}$"
 		}
 	 },
 	],
