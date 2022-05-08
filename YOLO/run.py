@@ -8,6 +8,9 @@ from AlteiaTransactions.ImportDataset import import_dataset
 from AlteiaTransactions.ImportWeights import import_weights
 from AlteiaTransactions.ExportAnnotations import export_annotations
 
+from PDFReport import pdf_report
+
+
 sys.path.insert(1, './yolov5')
 
 PATH_TO_PICS='./dataset/images/'
@@ -34,8 +37,8 @@ def run(project_id, mission_id, WORKING_DIR):
 									" --project "+str(project_path) # --nosave True"
 	subprocess.run(cmd, shell=True)
 
-	export_annotations(project_id, mission_id, annotations_format='yolo', annotations_dir=project_path / 'exp')
-
+	df_annotations = export_annotations(project_id, mission_id, annotations_format='yolo', annotations_dir=project_path / 'exp')
+	pdf_report(df_annotations, images_dir=dataset_path / 'images')
 
 
 if __name__ == "__main__":
