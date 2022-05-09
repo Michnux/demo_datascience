@@ -2,7 +2,7 @@ import sys
 import alteia
 from pathlib import Path
 sys.path.insert(0, './YOLO')
-from AlteiaTransactions.ExportAnnotations import export_annotations
+from AlteiaTransactions.ExportAnnotations import export_annotations, convert_annotations
 
 
 
@@ -15,6 +15,8 @@ if __name__ == "__main__":
 
 
 	WORKING_DIR = Path('./').resolve()
-	annotations_dir = WORKING_DIR / 'chess/valid/'
+	annotations_dir = WORKING_DIR / 'chess_geo/train/'
 
-	export_annotations(project.id, '6277e95a1aef750007602a56', 'yolo', annotations_dir)
+
+	df_annotations = convert_annotations('6278e18d1aef750007602a68', '6278e1c444872f0008e07a43', 'yolo', annotations_dir)
+	export_annotations('6278e18d1aef750007602a68', '6278e1c444872f0008e07a43', df_annotations)

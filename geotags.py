@@ -55,8 +55,8 @@ if __name__ == "__main__":
 
 	# my_exif = read_exif('IMG_9559.JPG')
 
-	dir_path = Path('./chess/valid/images/')
-	out_path = Path('./geottagged_pics/')
+	dir_path = Path('./chess/train/images/')
+	out_path = Path('./chess_geo/train/')
 	files = os.listdir(dir_path)
 	print(files)
 	if not os.path.exists(out_path):
