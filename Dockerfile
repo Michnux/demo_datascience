@@ -1,17 +1,14 @@
-FROM pytorch/pytorch
+FROM ubuntu
 
 
-RUN apt update
-#RUN apt -y install python3.8
-RUN apt -y install python3-pip
-
-RUN apt install -y libgl1-mesa-glx
-RUN apt install -y libglib2.0-0
-
-RUN apt install -y build-essential
-RUN apt install -y libpcre3-dev libssl-dev zlib1g-dev
-RUN apt install -y git
-RUN apt install -y nano
+RUN apt update &&\
+	apt install -y python3-pip &&\
+	apt install -y libgl1-mesa-glx &&\
+	apt install -y libglib2.0-0 &&\
+	apt install -y build-essential &&\
+	apt install -y libpcre3-dev libssl-dev zlib1g-dev &&\
+	apt install -y git &&\
+	apt install -y nano
 
 # install yolo from source
 #RUN \
