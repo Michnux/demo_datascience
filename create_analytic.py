@@ -6,23 +6,23 @@ sdk = alteia.SDK(config_path='./config-connections.json')
 
 
 
-analytic = sdk.analytics.search(name="alteiademo/run_yolov5")
+analytic = sdk.analytics.search(name="appledemo/run_yolov5")
 if len(analytic)>0:
 	analytic=analytic[0]
 	sdk.analytics.delete(analytic=analytic.id)
 
-analytic = sdk.analytics.search(name="alteiademo/train_yolov5")
+analytic = sdk.analytics.search(name="appledemo/train_yolov5")
 if len(analytic)>0:
 	analytic=analytic[0]
 	sdk.analytics.delete(analytic=analytic.id)
 
 
-sdk.analytics.create(name="alteiademo/run_yolov5",
-	version="2.0.0",
+sdk.analytics.create(name="appledemo/run_yolov5",
+	version="1.0.0",
 	display_name="run_yolov5",
 	description="Runs yolov5 (object detection) on a survey",
 	docker_image="registry-1.docker.io/michaeldelagarde/yv5:latest",
-	company="5c1a2567b3c575583e8a650d",
+	company="627388a02e780e000858200c",
 	instance_type='small',
 	volume_size=20,
 	inputs=[{
@@ -53,12 +53,12 @@ sdk.analytics.create(name="alteiademo/run_yolov5",
 	groups=["DATA SCIENCE"])
 
 
-sdk.analytics.create(name="alteiademo/train_yolov5",
-	version="2.0.0",
+sdk.analytics.create(name="appledemo/train_yolov5",
+	version="1.0.0",
 	display_name="train_yolov5",
 	description="Runs yolov5 (object detection) on a survey",
 	docker_image="registry-1.docker.io/michaeldelagarde/yv5:latest",
-	company="5c1a2567b3c575583e8a650d",
+	company="627388a02e780e000858200c",
 	instance_type='small',
 	volume_size=20,
 	inputs=[{

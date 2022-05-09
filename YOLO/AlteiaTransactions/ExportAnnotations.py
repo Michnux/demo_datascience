@@ -12,7 +12,7 @@ annotations_formats = ['SuperAnnotate', 'yolo']
 
 
 #takes annotations and uploads them as alteia annotations on the corresponding pictures
-def export_annotations(project_id, mission_id, annotations_format, annotations_dir):
+def convert_annotations(project_id, mission_id, annotations_format, annotations_dir):
 
 	#open Alteia sdk
 	sdk = alteia.SDK(config_path='./config-connections.json')
@@ -32,8 +32,6 @@ def export_annotations(project_id, mission_id, annotations_format, annotations_d
 						})])
 
 	df_images=df_images.drop_duplicates() #it is assumed there is no duplicates
-
-	print(df_images.to_string())
 
 	#put yolo annotations in a pandas df
 	if annotations_format=='yolo':
@@ -68,9 +66,16 @@ def export_annotations(project_id, mission_id, annotations_format, annotations_d
 		df_annotations = df_annotations.join(df_classes, on='class')
 
 
-	print(df_annotations.to_string())
+	return df_annotations
 
+
+def export_annotations(project_id, mission_id, df_annotations):
+
+	annots=[]
 	cmap_boxes = cm.get_cmap("Set1") # colour map
+
+	#open Alteia sdk
+	sdk = alteia.SDK(config_path='./config-connections.json')
 
 	#create alteia annotations
 	for _, r in df_annotations.iterrows():
@@ -82,7 +87,6 @@ def export_annotations(project_id, mission_id, annotations_format, annotations_d
 
 		rgba = cmap_boxes(int(r['class']%9))
 		rgb = [int(rgba[0]*255), int(rgba[1]*255), int(rgba[2]*255)]
-
 
 		sdk.annotations.create(
 			project=project_id,
@@ -101,6 +105,30 @@ def export_annotations(project_id, mission_id, annotations_format, annotations_d
 			)
 
 
+		# annots.append(
+		# 	{
+		# 	"project":project_id,
+		# 	"geometry":{
+		# 		"type": "Polygon",
+		# 		"coordinates": [[[x1,y1],[x2,y1], [x2,y2], [x1,y2], [x1,y1]]]
+		# 	},
+		# 	"name":r['class_name'],
+		# 	"type":'image',
+		# 	"target":r['image_id'],
+		# 	"stroke":rgb,
+		# 	"stroke_width":2,
+		# 	"stroke_opacity":0.8,
+		# 	"fill":rgb,
+		# 	"fill_opacity":0.8
+		# 	})
+
+	# sdk.annotations.create_annotations(annots[0:10])
+
+
+
+
+
+
 if __name__ == "__main__":
 
 
@@ -109,7 +137,8 @@ if __name__ == "__main__":
 	mission = sdk.missions.search(filter={'project': {'$eq': project.id}})[0]
 
 
-	WORKING_DIR = Path('./').resolve()
-	annotations_dir = WORKING_DIR / 'dataset/exp/'
+	WORKING_DIR = Path('C:\\Users\\michael.delagarde\\Documents\\DEV\\DemoDataScience\\work_dir').resolve()
+	annotations_dir = WORKING_DIR / 'project/exp/'
 
-	export_annotations(project.id, mission.id, 'yolo', annotations_dir)
+	df_annotations = convert_annotations('6242fedbc55a3c0007254175', '6277e95a1aef750007602a56', 'yolo', annotations_dir)
+	export_annotations('6242fedbc55a3c0007254175', '6277e95a1aef750007602a56', df_annotations)
