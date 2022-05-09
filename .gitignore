@@ -3,12 +3,15 @@
 *.exe
 *.pt
 *.yaml
+*.pdf
 
 *project/
+*chess/
+*chess_geo/
 *dataset/
 *annotations/
 *labels/
 astack-docker1-eb0587273972320d64cb4f333610064d1132993d*
 
 config-connections.json
-dockerhub-credentials.json
+docker_credentials.json
