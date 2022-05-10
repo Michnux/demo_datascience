@@ -63,11 +63,35 @@ def main():
 		print(">>>>>>>>>>>>>>>>>> lauching yolov5 train ")
 		train(project_id, mission_id, epochs, image_size, WORKING_DIR)
 
+
+
 	else: #this is a run
 		print(">>>>>>>>>>>>>>>>>> lauching volov5 run ")
 		run(project_id, mission_id, WORKING_DIR)
 
 
+		# logging.debug('Creating the outputs.json')
+		# output = {
+		# 	"outputs": {
+		# 		"annotation-report": {  # Must match the name of deliverable in rust-detector.yaml
+		# 			"type": "file",
+		# 			"format": "pdf",
+		# 			"name": "annotation-report",
+		# 			"components": [
+		# 				{
+		# 					"name": "file",
+		# 					"path": str(outpath)
+		# 				}
+		# 			]
+		# 		}
+		# 	},
+		# 	"version": "0.1"
+		# }
+		# with open(WORKING_DIR / 'outputs.json', 'w+') as f:
+		# 	json.dump(output, f)
+
+
+	# Create the outputs.json to describe the deliverable and its path (it's empty here as no output has been generated)
 	output = {
 		"outputs": {
 		},
@@ -75,7 +99,6 @@ def main():
 	}
 	with open(WORKING_DIR / 'outputs.json', 'w+') as f:
 		json.dump(output, f)
-
 
 	logging.debug('All done...')
 

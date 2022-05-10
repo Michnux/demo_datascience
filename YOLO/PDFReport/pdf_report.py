@@ -30,8 +30,7 @@ def pdf_report(df_annotations, images_dir, WORKING_DIR):
 
 	p = 0 #current page of the pdf file
 
-	# for k in range(len(images)):
-	for k in range(6):
+	for k in range(len(images)):
 
 		if floor(k/(nrows*ncols))>p:
 			pdf.savefig(fig)

@@ -48,8 +48,26 @@ sdk.analytics.create(name="appledemo/run_yolov5",
 	parameters=[
 	],
 	deliverables=[
+		# {
+		# 	"name": "annotation-report",
+		# 	"display_name": "annotation-report",
+		# 	"description": ".pdf files with information about the run_yolov5 run",
+		# 	"scheme": {
+		# 		"type": "string", "pattern": "^[0-9]{1,24}$"
+		# 	},
+		# 	"source": {
+		# 		"service": "data-manager",
+		# 		"resource": "dataset",
+		# 		"scheme": {
+		# 			"type": "object",
+		# 			# "category": "object detection",
+		# 			"properties": {"type": {"const": "file"}}, ####
+		# 			"required": ["type"]
+		# 		},
+		# 	},
+		# 	"required": True
+		# },
 	],
-	# tags=["croquette"],
 	groups=["DATA SCIENCE"])
 
 
@@ -105,5 +123,4 @@ sdk.analytics.create(name="appledemo/train_yolov5",
 	],
 	deliverables=[
 	],
-	# tags=["croquette"],
 	groups=["DATA SCIENCE"])

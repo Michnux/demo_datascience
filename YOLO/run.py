@@ -6,6 +6,7 @@ import alteia
 
 from AlteiaTransactions.ImportDataset import import_dataset
 from AlteiaTransactions.ImportWeights import import_weights
+from AlteiaTransactions.ExportPDFReport import export_pdf_report
 from AlteiaTransactions.ExportAnnotations import export_annotations, convert_annotations
 from PDFReport.pdf_report import pdf_report
 
@@ -36,6 +37,7 @@ def run(project_id, mission_id, WORKING_DIR):
 	df_annotations = convert_annotations(project_id, mission_id, annotations_format='yolo', annotations_dir=project_path / 'exp')
 	export_annotations(project_id, mission_id, df_annotations)
 	pdf_report(df_annotations, images_dir=dataset_path / 'images', WORKING_DIR=WORKING_DIR)
+	export_pdf_report(project_id, mission_id, WORKING_DIR / 'Annotations_report.pdf')
 
 
 if __name__ == "__main__":

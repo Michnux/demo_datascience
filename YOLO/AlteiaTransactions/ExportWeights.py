@@ -1,7 +1,4 @@
 import alteia
-import os
-import string
-import pandas as pd
 import json
 from pathlib import Path
 
