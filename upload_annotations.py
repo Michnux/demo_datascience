@@ -18,5 +18,5 @@ if __name__ == "__main__":
 	annotations_dir = WORKING_DIR / 'chess_geo/train/'
 
 
-	df_annotations = convert_annotations('6278e18d1aef750007602a68', '6278e1c444872f0008e07a43', 'yolo', annotations_dir)
-	export_annotations('6278e18d1aef750007602a68', '6278e1c444872f0008e07a43', df_annotations)
+	df_annotations = convert_annotations(project.id, mission.id, 'yolo', annotations_dir)
+	export_annotations(project.id, mission.id, df_annotations)

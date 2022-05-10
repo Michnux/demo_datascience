@@ -16,7 +16,7 @@
 			"checksum": "793a849994c04f60c72869a4c865639b",
 			"filename": "Feraillage 3D RADIER IFCSITE.ifc",
 			"size": 687535,
-			"path": "/home/work_dir/last.pt"}],
+			"path": "/home/work_dir/yolov5s.pt"}],
 		"name": "weights",
 		"type": "file",
 		"company": "5c1a2567b3c575583e8a650d",
@@ -27,6 +27,8 @@
 	},
 
 	"parameters":{
+		"epochs":10,
+		"image_size":640,
 		"project": "6242fedbc55a3c0007254175",
 		"mission": "6277e95a1aef750007602a56"
 	}
